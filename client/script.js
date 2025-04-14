@@ -7,7 +7,6 @@ let messages = JSON.parse(localStorage.getItem("myChatHistory")) || [];
 
 // Laad de opgeslagen chatgeschiedenis wanneer de pagina opnieuw wordt geladen
 window.addEventListener("DOMContentLoaded", () => {
-    // Loop door de berichten en voeg ze toe aan de chat
     messages.forEach(([role, message]) => {
         if (role === "human") {
             addUserMessage(message);
@@ -15,6 +14,8 @@ window.addEventListener("DOMContentLoaded", () => {
             addBotMessage(message);
         }
     });
+    // Scroll naar beneden na het laden van de chat
+    chatArea.scrollTop = chatArea.scrollHeight;
 });
 
 form.addEventListener("submit", async (e) => {
@@ -32,7 +33,6 @@ form.addEventListener("submit", async (e) => {
     // Voeg de gebruikersvraag toe aan de chat
     addUserMessage(prompt);
 
-    // Maak de request opties voor de API-aanroep
     const options = {
         method: 'POST',
         mode: 'cors',
@@ -40,7 +40,7 @@ form.addEventListener("submit", async (e) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ messages })
-    }
+    };
 
     try {
         const response = await fetch("http://localhost:3000/", options);
@@ -78,7 +78,7 @@ function addUserMessage(message) {
         <div class="message">${message}</div>
     `;
     chatArea.appendChild(bubble);
-    chatArea.scrollTop = chatArea.scrollHeight;
+    chatArea.scrollTop = chatArea.scrollHeight; // Scroll naar beneden
 }
 
 function addBotMessage(message) {
@@ -89,5 +89,5 @@ function addBotMessage(message) {
         <div class="message">${message}</div>
     `;
     chatArea.appendChild(bubble);
-    chatArea.scrollTop = chatArea.scrollHeight;
+    chatArea.scrollTop = chatArea.scrollHeight; // Scroll naar beneden
 }

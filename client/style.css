@@ -1,19 +1,20 @@
-/* Achtergrond en basis */
+/* Basisinstellingen */
 body {
     margin: 0;
     font-family: 'Trebuchet MS', sans-serif;
-    background-image: url('assets/background.jpg'); /* Een fantasy-achtige achtergrond */
+    background-image: url('assets/background.jpg'); /* Fantasy-achtergrond */
     background-size: cover;
     background-position: center;
     color: #fff;
-    position: relative;
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    position: relative;
 }
 
-/* Semi-transparant overlay om tekst beter leesbaar te maken */
+/* Semi-transparante overlay */
 .background-overlay {
     position: absolute;
     inset: 0;
@@ -21,49 +22,87 @@ body {
     z-index: 0;
 }
 
-/* Container voor chat */
+/* Titel linksboven */
+.title {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 2.5rem;
+    color: #fff;
+    margin: 0;
+}
+
+/* Chatcontainer */
 .chat-container {
     position: relative;
     z-index: 1;
     background-color: rgba(20, 20, 20, 0.85);
     padding: 2rem;
     border-radius: 16px;
-    max-width: 600px;
+    max-width: 800px; /* Breder dan voorheen */
     width: 90%;
     text-align: center;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
 }
 
-/* Titel & subtitel */
-.title {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
+/* Subtitel */
 .subtitle {
-    font-size: 1rem;
+    font-size: 1.25rem;
     margin-bottom: 1.5rem;
     color: #ccc;
 }
 
-/* Formulier styling */
+/* Chatberichten sectie */
+.chat-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    max-height: 70%;
+    width: 100%; /* Maak het reactieveld breder */
+}
+
+/* Scrollbar styling */
+.chat-area::-webkit-scrollbar {
+    width: 8px; /* Breedte van de scrollbar */
+}
+
+.chat-area::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.2); /* Achtergrond van de track */
+}
+
+.chat-area::-webkit-scrollbar-thumb {
+    background-color: #3d9970; /* Grijze kleur voor de scrollbar */
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2); /* Voeg een beetje ruimte toe rondom de scrollbar */
+}
+
+.chat-area::-webkit-scrollbar-thumb:hover {
+    background-color: #2e7d5a; /* Donkerder wanneer je eroverheen hovert */
+}
+
+/* Formulier */
 form {
     display: flex;
-    gap: 10px;
     justify-content: center;
-    margin-bottom: 1rem;
+    gap: 10px;
+    margin-top: 1rem;
 }
 
 input[type="text"] {
-    padding: 0.75rem;
+    padding: 1rem;
     border-radius: 8px;
     border: none;
     flex: 1;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    width: 80%;
 }
 
 button {
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.5rem;
     border-radius: 8px;
     border: none;
     background-color: #3d9970;
@@ -71,19 +110,11 @@ button {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    font-size: 1.1rem;
 }
 
 button:hover {
     background-color: #2e7d5a;
-}
-
-.chat-area {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-top: 1rem;
-    max-height: 300px;
-    overflow-y: auto;
 }
 
 /* Bubbels */
@@ -91,6 +122,7 @@ button:hover {
     display: flex;
     align-items: flex-start;
     gap: 10px;
+    margin-bottom: 1rem;
 }
 
 .chat-bubble.bot {
@@ -102,8 +134,8 @@ button:hover {
 }
 
 .avatar {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 6px;
     image-rendering: pixelated;
 }
@@ -112,11 +144,10 @@ button:hover {
     background-color: #2b2b2b;
     border: 1px solid #3d9970;
     border-radius: 12px;
-    padding: 0.75rem 1rem;
-    max-width: 70%;
+    padding: 1rem;
+    max-width: 75%;
     color: #fff;
-    font-size: 0.95rem;
+    font-size: 1.1rem; /* Grotere tekstgrootte */
     line-height: 1.4;
     white-space: pre-wrap;
 }
-
