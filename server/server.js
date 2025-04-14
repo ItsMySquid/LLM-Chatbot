@@ -1,8 +1,13 @@
 import express from 'express'
 import cors from 'cors'
 import { AzureChatOpenAI } from "@langchain/openai";
+import { Readable } from "stream";
 
-const model = new AzureChatOpenAI({ temperature: 1 });
+const model = new AzureChatOpenAI({
+    temperature: 0.5,
+    verbose: false,
+    maxTokens: 40,
+});
 
 const app = express()
 app.use(cors())
@@ -18,7 +23,8 @@ app.get('/', async (req, res) => {
 //eerste pose function
 app.post('/', async (req, res) => {
     let prompt = req.body.prompt
-    const result = await model.invoke(prompt)
+    let engineeredPrompt = `Beantwoord de volgende vraag als een Hypixel Skyblock-speler. Houd het antwoord kort en duidelijk: ${prompt}`
+    const result = await model.invoke(engineeredPrompt)
     res.json({ message: result.content })
 })
 

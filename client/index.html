@@ -5,18 +5,26 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Frontend LLM</title>
+    <title>Skyblock Chatbot</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main>
+<div class="background-overlay"></div>
+<main class="chat-container">
+    <h1 class="title">Skyblock Chatbot</h1>
+    <p class="subtitle">Vraag om advies en ontdek je volgende stap in Hypixel Skyblock!</p>
+
     <form>
-        <input type="text" placeholder="Je vraag hier..." id="chatfield" required>
-        <button type="submit">Vraag chat</button>
+        <input type="text" placeholder="Typ je vraag hier..." id="chatfield" required>
+        <button type="submit">Stel Vraag</button>
     </form>
-    <p id="chat">test</p>
+
+
+    <div class="chat-output" id="chat">
+        <!-- Chatbubbels worden hier via JS toegevoegd -->
+    </div>
 </main>
 
-<!-- Laad het script onderaan zodat de DOM eerst beschikbaar is -->
 <script src="script.js"></script>
 </body>
 </html>

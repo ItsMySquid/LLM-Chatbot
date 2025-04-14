@@ -1,0 +1,122 @@
+/* Achtergrond en basis */
+body {
+    margin: 0;
+    font-family: 'Trebuchet MS', sans-serif;
+    background-image: url('assets/background.jpg'); /* Een fantasy-achtige achtergrond */
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    position: relative;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Semi-transparant overlay om tekst beter leesbaar te maken */
+.background-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 0;
+}
+
+/* Container voor chat */
+.chat-container {
+    position: relative;
+    z-index: 1;
+    background-color: rgba(20, 20, 20, 0.85);
+    padding: 2rem;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+/* Titel & subtitel */
+.title {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    color: #ccc;
+}
+
+/* Formulier styling */
+form {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+input[type="text"] {
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: none;
+    flex: 1;
+    font-size: 1rem;
+}
+
+button {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: none;
+    background-color: #3d9970;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2e7d5a;
+}
+
+.chat-area {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Bubbels */
+.chat-bubble {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.chat-bubble.bot {
+    flex-direction: row;
+}
+
+.chat-bubble.user {
+    flex-direction: row-reverse;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    image-rendering: pixelated;
+}
+
+.message {
+    background-color: #2b2b2b;
+    border: 1px solid #3d9970;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    max-width: 70%;
+    color: #fff;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
