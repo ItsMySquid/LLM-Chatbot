@@ -11,6 +11,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "dev": "vite",
     "server": "node --env-file=server/.env --watch server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,5 +25,8 @@
     "url": "https://github.com/ItsMySquid/LLM-Chatbot/issues"
   },
   "homepage": "https://github.com/ItsMySquid/LLM-Chatbot#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "vite": "^6.2.6"
+  }
 }

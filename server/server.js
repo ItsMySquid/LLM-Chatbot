@@ -6,12 +6,23 @@ const model = new AzureChatOpenAI({ temperature: 1 });
 
 const app = express()
 app.use(cors())
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
+// eerste get function
 app.get('/', async (req, res) => {
     const result = await tellJoke()
     res.json({ message: result })
 })
 
+//eerste pose function
+app.post('/', async (req, res) => {
+    let prompt = req.body.prompt
+    const result = await model.invoke(prompt)
+    res.json({ message: result.content })
+})
+
+//tijdelijke joke function
 async function tellJoke() {
     const joke = await model.invoke("Tell me a Javascript joke!")
     return joke.content
