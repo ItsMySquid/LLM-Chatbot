@@ -13,24 +13,21 @@ app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-// eerste get function
-app.get('/', async (req, res) => {
-    const result = await tellJoke()
-    res.json({ message: result })
-})
-
-//eerste pose function
 app.post('/', async (req, res) => {
-    let prompt = req.body.prompt
-    let engineeredPrompt = `Beantwoord de volgende vraag als een Hypixel Skyblock-speler. Houd het antwoord kort en duidelijk: ${prompt}`
-    const result = await model.invoke(engineeredPrompt)
-    res.json({ message: result.content })
-})
+    const prompt = req.body.prompt;
+    const engineeredPrompt = `Beantwoord de volgende vraag als een Hypixel Skyblock-speler. Houd het antwoord kort en duidelijk: ${prompt}`;
 
-//tijdelijke joke function
-async function tellJoke() {
-    const joke = await model.invoke("Tell me a Javascript joke!")
-    return joke.content
-}
+    const stream = await model.stream(engineeredPrompt);
+
+    res.setHeader("Content-Type", "text/plain");
+    res.setHeader("Transfer-Encoding", "chunked");
+
+    for await (const chunk of stream) {
+        res.write(chunk.content); // Stuur elk stukje tekst zodra het beschikbaar is
+    }
+
+    res.end();
+});
+
 
 app.listen(3000, () => console.log(`Server running on http://localhost:3000`))
