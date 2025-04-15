@@ -1,7 +1,6 @@
 import express from 'express'
 import cors from 'cors'
 import { AzureChatOpenAI } from "@langchain/openai";
-import { Readable } from "stream";
 
 const model = new AzureChatOpenAI({
     temperature: 0.5,
