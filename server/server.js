@@ -1,9 +1,15 @@
-import express from 'express';
+import express, {text} from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { AzureChatOpenAI } from "@langchain/openai";
+import { AzureChatOpenAI, AzureOpenAIEmbeddings } from "@langchain/openai";
+import { FaissStore } from "@langchain/community/vectorstores/faiss";
+import {AIMessage, HumanMessage} from "@langchain/core/messages";
 
 dotenv.config();
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const model = new AzureChatOpenAI({
     temperature: 0.3,
@@ -11,10 +17,13 @@ const model = new AzureChatOpenAI({
     maxTokens: 200,
 });
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const embeddings = new AzureOpenAIEmbeddings({
+    temperature: 0,
+    azureOpenAIApiEmbeddingsDeploymentName: process.env.AZURE_EMBEDDING_DEPLOYMENT_NAME
+});
+
+const vectorStore = await FaissStore.load("guidestore", embeddings)
+
 
 const API_KEY = process.env.HYPIXEL_API_KEY;
 
@@ -218,6 +227,7 @@ async function getPlayerProfile(username) {
 
         const profileRes = await fetch(`https://api.hypixel.net/v2/skyblock/profiles?key=${API_KEY}&uuid=${uuid}`);
         const profileData = await profileRes.json();
+        // console.log(profileData);
 
         if (!profileData.success || !profileData.profiles) return null;
 
@@ -253,44 +263,88 @@ async function getPlayerProfile(username) {
 }
 
 app.post('/', async (req, res) => {
-    const { prompt, username } = req.body;
+    const { prompt, username, history } = req.body;
     let profileDataText = "";
-    let profile = null;
+    let profile;
 
-    if (username) {
-        profile = await getPlayerProfile(username);
-        // console.log(profile);
-
-        if (!profile) {
-            return res.status(404).send("Kon geen profielinformatie vinden.");
-        }
-
-        // Bouw een string van de skill levels zoals: "FISHING: 60, MINING: 59, ..."
-        profileDataText = Object.entries(profile)
-            .map(([skill, level]) => `${skill.replace("SKILL_", "")}: ${level}`)
-            .join(", ");
+    // Controleer of history een array is, en of deze niet leeg is
+    if (!Array.isArray(history)) {
+        return res.status(400).send("Geschiedenis is ongeldig.");
     }
 
-    let engineeredPrompt = "";
+    // Log de geschiedenis voor debuggen, zelfs als deze leeg is
+    console.log(history);
 
+    if (username) {
+        try {
+            profile = await getPlayerProfile(username);
+
+            if (!profile) {
+                return res.status(404).send("Kon geen profielinformatie vinden.");
+            }
+
+            // Bouw de string van de skill levels
+            profileDataText = Object.entries(profile)
+                .map(([skill, level]) => `${skill.replace("SKILL_", "")}: ${level}`)
+                .join(", ");
+        } catch (error) {
+            return res.status(500).send("Er is iets mis gegaan bij het ophalen van het profiel.");
+        }
+    }
+
+    // Verwerk de geschiedenis en voeg berichten toe, zelfs als de geschiedenis leeg is
+    const messages = history.map(({ sender, text }) => {
+        return sender === "user" ? new HumanMessage(text) : new AIMessage(text);
+    });
+
+    // Voeg het huidige gebruikersbericht toe, ongeacht de geschiedenis
+    messages.push(new HumanMessage(prompt));
+
+    // Haal relevante documenten op uit de vector store
+    let context = "";
+    try {
+        const relevantDocs = await vectorStore.similaritySearch("What is this document about?", 3);
+        context = relevantDocs.map(doc => doc.pageContent).join("\n\n");
+    } catch (error) {
+        return res.status(500).send("Er is iets mis gegaan bij het ophalen van de documenten.");
+    }
+
+    // Bouw het prompt op basis van gebruikersinformatie
+    let engineeredPrompt = "";
     if (username && profileDataText) {
-        // Prompt mét gebruikersdata
         engineeredPrompt = `Je bent een behulpzame en ervaren Hypixel Skyblock-gids. Hier zijn de statistieken van speler ${username}: ${profileDataText}. Beantwoord de volgende vraag op basis van deze gegevens: "${prompt}". Geef een kort, duidelijk en persoonlijk antwoord dat relevant is voor deze speler.`;
     } else {
-        // Prompt zónder gebruikersdata
         engineeredPrompt = `Je bent een behulpzame en ervaren Hypixel Skyblock-gids. Beantwoord de volgende algemene vraag: "${prompt}". Houd het antwoord duidelijk en kort, gericht op zowel beginners als ervaren spelers.`;
     }
 
-    const stream = await model.stream(engineeredPrompt);
-
-    res.setHeader("Content-Type", "text/plain");
-    res.setHeader("Transfer-Encoding", "chunked");
-
-    for await (const chunk of stream) {
-        res.write(chunk.content);
+    // Vraag aan het model voor een antwoord
+    let response;
+    try {
+        response = await model.invoke([
+            ["system", "Use only the following context to answer the user's question."],
+            ["user", `Context: ${context}\n\nQuestion: ${prompt}`]
+        ]);
+        console.log("Answer found:");
+        console.log(response.content);
+    } catch (error) {
+        return res.status(500).send("Er is iets mis gegaan bij het verkrijgen van een antwoord.");
     }
 
-    res.end();
+    // Stream de reactie naar de client
+    try {
+        const stream = await model.stream(engineeredPrompt);
+        res.setHeader("Content-Type", "text/plain");
+        res.setHeader("Transfer-Encoding", "chunked");
+
+        for await (const chunk of stream) {
+            res.write(chunk.content);
+        }
+
+        res.end();
+    } catch (error) {
+        return res.status(500).send("Er is iets mis gegaan bij het streamen van het antwoord.");
+    }
 });
+
 
 app.listen(3000, () => console.log(`Server running on http://localhost:3000`));
