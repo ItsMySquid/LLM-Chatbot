@@ -27,8 +27,8 @@ Dit project is een **Node.js Express server** die informatie biedt over **Hypixe
 
 1. **Clone de repository**:
    ```bash
-   git clone https://github.com/jouwgebruikersnaam/hypixel-skyblock-guide-api.git
-   cd hypixel-skyblock-guide-api
+   git clone https://github.com/ItsMySquid/LLM-Chatbot.git
+   cd LLM-Chatbot
    ```
 
 2. **Installeer de dependencies**:
