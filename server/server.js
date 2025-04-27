@@ -14,7 +14,6 @@ app.use(express.urlencoded({ extended: true }));
 const model = new AzureChatOpenAI({
     temperature: 0.3,
     verbose: false,
-    maxTokens: 200,
 });
 
 const embeddings = new AzureOpenAIEmbeddings({
